@@ -95,7 +95,7 @@ export default function Chat() {
               />
             </svg>
           </button>
-          <h1 className="text-2xl font-bold">DeepSeek-like Chat</h1>
+          <h1 className="text-2xl font-bold">LUREX AI</h1>
           <div className="w-6"></div> {/* Spacer for alignment */}
         </header>
 
