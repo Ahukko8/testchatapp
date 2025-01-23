@@ -11,6 +11,7 @@ export default function Chat() {
   const [input, setInput] = useState<string>('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -43,12 +44,17 @@ export default function Chat() {
 
   const handleNewChat = () => {
     setMessages([]); // Clear the chat messages
+    setIsSidebarOpen(false); // Close sidebar on mobile
   };
 
   return (
     <div className="flex h-screen bg-gray-900 text-gray-100">
-      {/* Sidebar */}
-      <div className="w-64 bg-gray-800 border-r border-gray-700 p-4">
+      {/* Sidebar for Desktop */}
+      <div
+        className={`fixed md:relative z-20 w-64 bg-gray-800 border-r border-gray-700 p-4 transform transition-transform duration-200 ease-in-out ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
         <button
           onClick={handleNewChat}
           className="w-full p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -58,11 +64,39 @@ export default function Chat() {
         {/* Additional sidebar content can go here */}
       </div>
 
+      {/* Overlay for Mobile Sidebar */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-10 bg-black bg-opacity-50 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        ></div>
+      )}
+
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-gray-800 border-b border-gray-700 p-4">
-          <h1 className="text-2xl font-bold">Lurex AI</h1>
+        <header className="bg-gray-800 border-b border-gray-700 p-4 flex items-center justify-between">
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="md:hidden p-2 text-gray-300 hover:text-white"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16m-7 6h7"
+              />
+            </svg>
+          </button>
+          <h1 className="text-2xl font-bold">DeepSeek-like Chat</h1>
+          <div className="w-6"></div> {/* Spacer for alignment */}
         </header>
 
         {/* Chat Messages */}
