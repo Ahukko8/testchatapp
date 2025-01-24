@@ -137,14 +137,14 @@ const HomePage: React.FC = () => {
         <footer className="bg-black/50 backdrop-blur-sm border-t border-green-800/30 p-4">
           <div className="container mx-auto text-center text-green-300">
             <p>&copy; 2025 LUREX. All rights reserved.</p>
-            <div className="mt-2 space-x-4">
+            {/* <div className="mt-2 space-x-4">
               <a href="/privacy" className="hover:text-green-100">
                 Privacy Policy
               </a>
               <a href="/terms" className="hover:text-green-100">
                 Terms of Service
               </a>
-            </div>
+            </div> */}
           </div>
         </footer>
       </div>

@@ -1,9 +1,10 @@
 "use client"; // Mark this as a Client Component
 
-import { UserButton } from "@clerk/nextjs";
+import {  UserButton } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
-import { motion } from 'framer-motion'
-import { Menu, X, SendIcon } from 'lucide-react' // Import Paper Plane icon
+import { motion } from "framer-motion";
+import { Menu, X, SendIcon,  } from "lucide-react"; 
+
 
 type Message = {
   role: "user" | "ai";
@@ -21,10 +22,21 @@ export default function Chat({ userId }: ChatProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // const { signOut } = useClerk();
+  // const router = useRouter();
+
+  // const handleSignOut = async () => {
+  //   await signOut();
+  //   router.push("/"); // Redirect to home after sign out
+  // };
+
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(Math.max(textareaRef.current.scrollHeight, 48), 150)}px`;
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(
+        Math.max(textareaRef.current.scrollHeight, 48),
+        150
+      )}px`;
     }
   }, [input]);
 
@@ -109,16 +121,21 @@ export default function Chat({ userId }: ChatProps) {
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="p-2 text-green-400 hover:text-green-200"
           >
-            {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {isSidebarOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
           </button>
           <h1 className="text-2xl font-bold text-green-400">LUREX AI</h1>
           <div className="w-6">
-            <UserButton afterSignOutUrl="/" />
+            <UserButton />
+            
           </div>
         </header>
 
         {/* Chat Messages */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="flex-1 overflow-y-auto p-4 space-y-4 w-full"
@@ -164,7 +181,7 @@ export default function Chat({ userId }: ChatProps) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
+                if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
                   handleSend();
                 }
@@ -195,13 +212,19 @@ export default function Chat({ userId }: ChatProps) {
       {/* Global Styles for Matrix Effect */}
       <style jsx global>{`
         @keyframes matrix {
-          0% { background-position: 0 0; }
-          100% { background-position: 100% 100%; }
+          0% {
+            background-position: 0 0;
+          }
+          100% {
+            background-position: 100% 100%;
+          }
         }
         .bg-matrix {
-          background-image: 
-            linear-gradient(rgba(0,255,0,0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,255,0,0.1) 1px, transparent 1px);
+          background-image: linear-gradient(
+              rgba(0, 255, 0, 0.1) 1px,
+              transparent 1px
+            ),
+            linear-gradient(90deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px);
           background-size: 20px 20px;
           animation: matrix 10s linear infinite;
         }
@@ -210,9 +233,15 @@ export default function Chat({ userId }: ChatProps) {
           animation: gradient-x 15s ease infinite;
         }
         @keyframes gradient-x {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
         }
       `}</style>
     </div>
