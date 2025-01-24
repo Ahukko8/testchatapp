@@ -17,7 +17,6 @@ export default function ChatPage() {
 
   return (
     <div>
-      <div></div>
       <Chat userId={user.id} />
     </div>
   );
