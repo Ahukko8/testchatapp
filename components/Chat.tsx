@@ -1,14 +1,19 @@
-'use client'; // Mark this as a Client Component
+"use client"; // Mark this as a Client Component
 
-import { useState } from 'react';
+import { UserButton } from "@clerk/nextjs";
+import { useState } from "react";
 
 type Message = {
-  role: 'user' | 'ai';
+  role: "user" | "ai";
   content: string;
 };
 
-export default function Chat() {
-  const [input, setInput] = useState<string>('');
+type ChatProps = {
+  userId: string; // Add userId prop
+};
+
+export default function Chat({ userId }: ChatProps) {
+  const [input, setInput] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
@@ -17,28 +22,28 @@ export default function Chat() {
     if (!input.trim() || isLoading) return;
 
     setIsLoading(true);
-    const userMessage: Message = { role: 'user', content: input };
+    const userMessage: Message = { role: "user", content: input };
     setMessages((prev) => [...prev, userMessage]);
 
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input }),
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: input, userId }), // Include userId in the request
       });
 
       const data = await response.json();
-      const aiMessage: Message = { role: 'ai', content: data.reply };
+      const aiMessage: Message = { role: "ai", content: data.reply };
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
       console.error(error);
       setMessages((prev) => [
         ...prev,
-        { role: 'ai', content: 'Failed to fetch response. Please try again.' },
+        { role: "ai", content: "Failed to fetch response. Please try again." },
       ]);
     } finally {
       setIsLoading(false);
-      setInput('');
+      setInput("");
     }
   };
 
@@ -52,7 +57,7 @@ export default function Chat() {
       {/* Sidebar for Desktop */}
       <div
         className={`fixed md:relative z-20 w-64 bg-gray-800 border-r border-gray-700 p-4 transform transition-transform duration-200 ease-in-out ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
         <button
@@ -96,7 +101,10 @@ export default function Chat() {
             </svg>
           </button>
           <h1 className="text-2xl font-bold">LUREX AI</h1>
-          <div className="w-6"></div> {/* Spacer for alignment */}
+          <div className="w-6">
+            <UserButton afterSignOutUrl="/" />
+          </div>{" "}
+          {/* Spacer for alignment */}
         </header>
 
         {/* Chat Messages */}
@@ -105,14 +113,14 @@ export default function Chat() {
             <div
               key={index}
               className={`flex ${
-                msg.role === 'user' ? 'justify-end' : 'justify-start'
+                msg.role === "user" ? "justify-end" : "justify-start"
               }`}
             >
               <div
                 className={`max-w-[80%] rounded-lg p-3 ${
-                  msg.role === 'user'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-gray-100'
+                  msg.role === "user"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-700 text-gray-100"
                 }`}
               >
                 {msg.content}
@@ -139,7 +147,7 @@ export default function Chat() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+              onKeyPress={(e) => e.key === "Enter" && handleSend()}
               className="flex-1 p-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-100"
               placeholder="Type a message..."
               disabled={isLoading}
@@ -149,7 +157,7 @@ export default function Chat() {
               disabled={isLoading}
               className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Sending...' : 'Send'}
+              {isLoading ? "Sending..." : "Send"}
             </button>
           </div>
         </div>
