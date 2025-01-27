@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"; // Mark this as a Client Component
 
-import {  UserButton } from "@clerk/nextjs";
+import { UserButton } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Menu, X, SendIcon,  } from "lucide-react"; 
-
+import { Menu, X, SendIcon, Trash2 } from "lucide-react"; // Add Trash2 icon
 
 type Message = {
   role: "user" | "ai";
@@ -20,16 +21,26 @@ export default function Chat({ userId }: ChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const [chatHistory, setChatHistory] = useState<any[]>([]); // Store chat history
+  const [currentChatId, setCurrentChatId] = useState<string | null>(null); // Track the current chat session
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // const { signOut } = useClerk();
-  // const router = useRouter();
+  // Fetch chat history on component mount
+  useEffect(() => {
+    const fetchChatHistory = async () => {
+      try {
+        const response = await fetch("/api/chat/history");
+        const data = await response.json();
+        setChatHistory(data);
+      } catch (error) {
+        console.error("Failed to fetch chat history:", error);
+      }
+    };
 
-  // const handleSignOut = async () => {
-  //   await signOut();
-  //   router.push("/"); // Redirect to home after sign out
-  // };
+    fetchChatHistory();
+  }, []);
 
+  // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -40,12 +51,14 @@ export default function Chat({ userId }: ChatProps) {
     }
   }, [input]);
 
+  // Handle sending a message
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
     setIsLoading(true);
     const userMessage: Message = { role: "user", content: input };
-    setMessages((prev) => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
 
     try {
       const response = await fetch("/api/chat", {
@@ -56,7 +69,8 @@ export default function Chat({ userId }: ChatProps) {
 
       const data = await response.json();
       const aiMessage: Message = { role: "ai", content: data.reply };
-      setMessages((prev) => [...prev, aiMessage]);
+      const finalMessages = [...updatedMessages, aiMessage];
+      setMessages(finalMessages);
     } catch (error) {
       console.error(error);
       setMessages((prev) => [
@@ -69,9 +83,58 @@ export default function Chat({ userId }: ChatProps) {
     }
   };
 
-  const handleNewChat = () => {
-    setMessages([]); // Clear the chat messages
+  // Handle starting a new chat
+  const handleNewChat = async () => {
+    if (messages.length > 0) {
+      // Save the current chat session before starting a new one
+      try {
+        await fetch("/api/chat/history", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages, userId }),
+        });
+
+        // Refetch chat history to update the sidebar
+        const historyResponse = await fetch("/api/chat/history");
+        const historyData = await historyResponse.json();
+        setChatHistory(historyData);
+      } catch (error) {
+        console.error("Failed to save chat history:", error);
+      }
+    }
+
+    // Start a new chat session
+    setMessages([]);
+    setCurrentChatId(null); // Reset the current chat ID
     setIsSidebarOpen(false); // Close sidebar on mobile
+  };
+
+  // Load a specific chat session from history
+  const loadChatSession = (chatId: string) => {
+    const chat = chatHistory.find((chat) => chat._id === chatId);
+    if (chat) {
+      setMessages(chat.messages);
+      setCurrentChatId(chat._id);
+    }
+  };
+
+  // Handle clearing chat history
+  const handleClearHistory = async () => {
+    try {
+      const response = await fetch("/api/chat/history", {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setChatHistory([]); // Clear chat history in the state
+        setMessages([]); // Clear the current chat messages
+        setCurrentChatId(null); // Reset the current chat ID
+      } else {
+        console.error("Failed to clear chat history");
+      }
+    } catch (error) {
+      console.error("Failed to clear chat history:", error);
+    }
   };
 
   return (
@@ -95,6 +158,7 @@ export default function Chat({ userId }: ChatProps) {
           <X className="h-6 w-6" />
         </button>
 
+        {/* New Chat Button */}
         <motion.button
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -102,6 +166,37 @@ export default function Chat({ userId }: ChatProps) {
           className="w-full p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors mt-8"
         >
           New Chat
+        </motion.button>
+
+        {/* Chat History */}
+        <div className="mt-4">
+          <h2 className="text-lg font-bold text-green-400 mb-2">Chat History</h2>
+          {chatHistory.map((chat) => (
+            <motion.div
+              key={chat._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              onClick={() => loadChatSession(chat._id)}
+              className="p-2 hover:bg-green-800/30 rounded-lg cursor-pointer"
+            >
+              <p className="text-sm text-green-200 truncate">
+                {chat.messages[0]?.content || "New Chat"}
+              </p>
+              <p className="text-xs text-green-400">
+                {new Date(chat.createdAt).toLocaleString()}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Clear History Button */}
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          onClick={handleClearHistory}
+          className="w-full p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors mt-4 flex items-center justify-center gap-2"
+        >
+          <Trash2 className="h-4 w-4" /> Clear History
         </motion.button>
       </div>
 
@@ -130,7 +225,6 @@ export default function Chat({ userId }: ChatProps) {
           <h1 className="text-2xl font-bold text-green-400">LUREX AI</h1>
           <div className="w-6">
             <UserButton />
-            
           </div>
         </header>
 
@@ -173,7 +267,7 @@ export default function Chat({ userId }: ChatProps) {
           )}
         </motion.div>
 
-        {/* Input Area (ChatGPT Style, Input and Button on Same Line) */}
+        {/* Input Area */}
         <div className="bg-black/50 backdrop-blur-sm border-t border-green-800/30 p-4 w-full">
           <div className="flex sm:flex-row items-center space-y-2 gap-2 sm:space-y-0 sm:space-x-2 w-full">
             <textarea
@@ -191,13 +285,13 @@ export default function Chat({ userId }: ChatProps) {
               placeholder="Type a message..."
               disabled={isLoading}
             />
-            {/* Send Button with Paper Plane Icon */}
+            {/* Send Button */}
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleSend}
               disabled={isLoading}
-              className="p-3  text-white  hover:text-green-700 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed self-end"
+              className="p-3 text-white hover:text-green-700 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed self-end"
             >
               {isLoading ? (
                 <div className="animate-spin border-2 border-t-2 border-green-400 rounded-full"></div>

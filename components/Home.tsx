@@ -44,6 +44,13 @@ const HomePage: React.FC = () => {
         Chat
       </a>
       <a 
+        href="/image-generator" 
+        className="text-gray-300 hover:text-white transition-colors py-2 block md:inline"
+        onClick={() => setIsMenuOpen(false)}
+      >
+        AI Image Generator
+      </a>
+      <a 
         href="/about" 
         className="text-gray-300 hover:text-white transition-colors py-2 block md:inline"
         onClick={() => setIsMenuOpen(false)}
