@@ -126,7 +126,7 @@ export default function AIImageGenerator() {
               <div className="relative">
                 <img src={currentImage} alt="Generated preview" className="w-[20vw] rounded-lg" />
                 <button onClick={downloadImage} className="absolute top-2 right-2 bg-black/50 p-2 rounded-full text-green-400">
-                  <Download size={15} />
+                  <Download size={16} />
                 </button>
               </div>
             )}
