@@ -111,7 +111,7 @@ export default function AIImageGenerator() {
           <div className="absolute left-0 top-0 w-64 h-full bg-black/80 p-4 border-r border-green-500/30">
             <div className="flex justify-between items-center mb-4">
               <button onClick={() => router.push('/')} className="flex items-center text-green-400">
-                <ArrowLeft className="mr-2" /> Go Back
+                <ArrowLeft className="mr-2" />
               </button>
               <button onClick={() => setMenuOpen(false)} className="text-green-400">
                 <X size={24} />

@@ -5,7 +5,8 @@
 import { UserButton } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Menu, X, SendIcon, Trash2 } from "lucide-react"; // Add Trash2 icon
+import { Menu, X, SendIcon, Trash2, ArrowLeft } from "lucide-react"; // Add Trash2 icon
+import { useRouter } from 'next/navigation';
 
 type Message = {
   role: "user" | "ai";
@@ -17,6 +18,7 @@ type ChatProps = {
 };
 
 export default function Chat({ userId }: ChatProps) {
+  const router = useRouter();
   const [input, setInput] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -150,6 +152,9 @@ export default function Chat({ userId }: ChatProps) {
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
         style={{ height: "100vh" }} // Make sidebar full height
       >
+         <button onClick={() => router.push('/')} className="flex items-center text-green-400">
+                <ArrowLeft className="mr-2" /> 
+              </button>
         {/* Close Sidebar Button */}
         <button
           onClick={() => setIsSidebarOpen(false)}
@@ -222,7 +227,7 @@ export default function Chat({ userId }: ChatProps) {
               <Menu className="h-6 w-6" />
             )}
           </button>
-          <h1 className="text-2xl font-bold text-green-400">LUREX AI</h1>
+          <button onClick={() => router.push('/')} className="text-2xl font-bold text-green-400">LUREX AI</button>
           <div className="w-6">
             <UserButton />
           </div>
