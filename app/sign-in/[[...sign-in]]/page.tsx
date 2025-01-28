@@ -1,6 +1,7 @@
 'use client'; // Mark this as a Client Component
 
 import { SignIn } from '@clerk/nextjs';
+export const runtime = 'edge';
 
 export default function Page() {
   return (

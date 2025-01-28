@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import connectDB from '@/lib/mongodb';
 import Image from '@/models/Image';
-
+export const runtime = 'edge';
 export async function GET() {
   try {
     // Ensure MongoDB connection

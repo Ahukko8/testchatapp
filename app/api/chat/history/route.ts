@@ -2,7 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import connect from '@/lib/mongodb';
 import Chat from '@/models/Chat';
-
+export const runtime = 'edge';
 
 export async function GET() {
   const { userId } = await auth();
