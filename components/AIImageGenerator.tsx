@@ -66,7 +66,7 @@ export default function AIImageGenerator() {
     }, 3000);
 
     try {
-      const response: AxiosResponse<GenerateResponse> = await axios.post('/api/images/generate', { prompt }, { timeout: 30000 });
+      const response: AxiosResponse<GenerateResponse> = await axios.post('/api/images/generate', { prompt });
       setCurrentImage(response.data.imageUrl);
       
       const newImage: GeneratedImage = {
